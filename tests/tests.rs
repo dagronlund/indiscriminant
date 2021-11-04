@@ -8,7 +8,7 @@ fn test_bits() {
         B = 1,
         C = 2,
         D = 3,
-        Default,
+        _Default,
     }
 
     #[no_discrimination_bits(u8, 2)]
@@ -27,14 +27,14 @@ fn test_bits() {
         C = 2,
         D = 3,
         E = 4,
-        Default,
+        _Default,
     }
 
     assert!(TestEnum16::from_int(0) == TestEnum16::A);
     assert!(TestEnum16::from_int(4) == TestEnum16::E);
-    assert!(TestEnum16::from_int(5) == TestEnum16::Default);
-    assert!(TestEnum16::from_int(255) == TestEnum16::Default);
-    assert!(TestEnum16::Default.to_int() == 5);
+    assert!(TestEnum16::from_int(5) == TestEnum16::_Default);
+    assert!(TestEnum16::from_int(255) == TestEnum16::_Default);
+    assert!(TestEnum16::_Default.to_int() == 5);
 
     #[no_discrimination_bits(u8, 8)]
     #[derive(PartialEq)]
@@ -295,17 +295,17 @@ fn test_bits() {
         B253 = 253,
         // B254 = 254,
         B255 = 255,
-        Default,
+        _Default,
     }
 
     assert!(FullEnum::B0.to_int() == 0);
     assert!(FullEnum::B253.to_int() == 253);
-    assert!(FullEnum::Default.to_int() == 254);
+    assert!(FullEnum::_Default.to_int() == 254);
     assert!(FullEnum::B255.to_int() == 255);
 
     assert!(FullEnum::from_int(0) == FullEnum::B0);
     assert!(FullEnum::from_int(253) == FullEnum::B253);
-    assert!(FullEnum::from_int(254) == FullEnum::Default);
+    assert!(FullEnum::from_int(254) == FullEnum::_Default);
     assert!(FullEnum::from_int(255) == FullEnum::B255);
 
     #[no_discrimination_bits(u8, 2)]
@@ -314,17 +314,17 @@ fn test_bits() {
         A = 0,
         B = 1,
         D = 3,
-        Default,
+        _Default,
     }
 
     assert!(TestEnumMixed::A.to_int() == 0);
     assert!(TestEnumMixed::B.to_int() == 1);
-    assert!(TestEnumMixed::Default.to_int() == 2);
+    assert!(TestEnumMixed::_Default.to_int() == 2);
     assert!(TestEnumMixed::D.to_int() == 3);
 
     assert!(TestEnumMixed::from_int(0) == TestEnumMixed::A);
     assert!(TestEnumMixed::from_int(1) == TestEnumMixed::B);
-    assert!(TestEnumMixed::from_int(2) == TestEnumMixed::Default);
+    assert!(TestEnumMixed::from_int(2) == TestEnumMixed::_Default);
     assert!(TestEnumMixed::from_int(3) == TestEnumMixed::D);
 }
 
@@ -335,17 +335,17 @@ fn test_byte_str() {
     pub enum TestEnumAB {
         A = b"A",
         B = b"B",
-        Default,
+        _Default,
     }
 
     assert!(TestEnumAB::A.to_byte_str() == b"A");
     assert!(TestEnumAB::B.to_byte_str() == b"B");
-    assert!(TestEnumAB::Default.to_byte_str() == b"");
+    assert!(TestEnumAB::_Default.to_byte_str() == b"");
 
     assert!(TestEnumAB::from_byte_str(b"A") == TestEnumAB::A);
     assert!(TestEnumAB::from_byte_str(b"B") == TestEnumAB::B);
-    assert!(TestEnumAB::from_byte_str(b"") == TestEnumAB::Default);
-    assert!(TestEnumAB::from_byte_str(b"ASDF") == TestEnumAB::Default);
+    assert!(TestEnumAB::from_byte_str(b"") == TestEnumAB::_Default);
+    assert!(TestEnumAB::from_byte_str(b"ASDF") == TestEnumAB::_Default);
 }
 
 #[test]
@@ -355,15 +355,15 @@ fn test_str() {
     pub enum TestEnumAB {
         A = "A",
         B = "B",
-        Default,
+        _Default,
     }
 
     assert!(TestEnumAB::A.to_str() == "A");
     assert!(TestEnumAB::B.to_str() == "B");
-    assert!(TestEnumAB::Default.to_str() == "");
+    assert!(TestEnumAB::_Default.to_str() == "");
 
     assert!(TestEnumAB::from_str("A") == TestEnumAB::A);
     assert!(TestEnumAB::from_str("B") == TestEnumAB::B);
-    assert!(TestEnumAB::from_str("") == TestEnumAB::Default);
-    assert!(TestEnumAB::from_str("ASDF") == TestEnumAB::Default);
+    assert!(TestEnumAB::from_str("") == TestEnumAB::_Default);
+    assert!(TestEnumAB::from_str("ASDF") == TestEnumAB::_Default);
 }

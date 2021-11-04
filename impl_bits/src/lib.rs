@@ -13,63 +13,20 @@ enum IntegerType {
     U32 = "u32",
     U64 = "u64",
     U128 = "u128",
-    Default,
+    _Default,
 }
 
 impl IntegerType {
-    // fn from_str(s: &str) -> Result<Self, ()> {
-    //     match s {
-    //         "u8" => Ok(IntegerType::U8),
-    //         "u16" => Ok(IntegerType::U16),
-    //         "u32" => Ok(IntegerType::U32),
-    //         "u64" => Ok(IntegerType::U64),
-    //         "u128" => Ok(IntegerType::U128),
-    //         _ => Err(()),
-    //     }
-    // }
-
-    // fn to_str(&self) -> &str {
-    //     match self {
-    //         IntegerType::U8 => "u8",
-    //         IntegerType::U16 => "u16",
-    //         IntegerType::U32 => "u32",
-    //         IntegerType::U64 => "u64",
-    //         IntegerType::U128 => "u128",
-    //     }
-    // }
-
-    fn width_valid(&self, width: u8) -> bool {
+    fn get_width(&self) -> u8 {
         match self {
-            IntegerType::U8 => width <= 8,
-            IntegerType::U16 => width <= 16,
-            IntegerType::U32 => width <= 32,
-            IntegerType::U64 => width <= 64,
-            IntegerType::U128 => width <= 128,
-            _ => false,
+            IntegerType::U8 => 8,
+            IntegerType::U16 => 16,
+            IntegerType::U32 => 32,
+            IntegerType::U64 => 64,
+            IntegerType::U128 => 128,
+            _ => 0,
         }
     }
-
-    fn width_match(&self, width: u8) -> bool {
-        match self {
-            IntegerType::U8 => width == 8,
-            IntegerType::U16 => width == 16,
-            IntegerType::U32 => width == 32,
-            IntegerType::U64 => width == 64,
-            IntegerType::U128 => width == 128,
-            _ => false,
-        }
-    }
-
-    // fn suffix_valid(&self, s: &str) -> bool {
-    //     match self {
-    //         IntegerType::U8 => s == "u8",
-    //         IntegerType::U16 => s == "u16",
-    //         IntegerType::U32 => s == "u32",
-    //         IntegerType::U64 => s == "u64",
-    //         IntegerType::U128 => s == "u128",
-    //         _ => false,
-    //     }
-    // }
 
     fn value_valid(&self, value: usize) -> bool {
         match self {
@@ -115,7 +72,7 @@ pub fn no_discrimination_bits(args: TokenStream, input: TokenStream) -> TokenStr
 
     let integer_type = if let Some(arg) = iter.next() {
         match IntegerType::from_str(&arg.to_string()) {
-            IntegerType::Default => panic!("Invalid integer type argument!"),
+            IntegerType::_Default => panic!("Invalid integer type argument!"),
             integer_type => integer_type,
         }
     } else {
@@ -133,7 +90,7 @@ pub fn no_discrimination_bits(args: TokenStream, input: TokenStream) -> TokenStr
     let bit_width = if let Some(arg) = iter.next() {
         match arg.to_string().parse::<u8>() {
             Ok(bit_width) => {
-                if !integer_type.width_valid(bit_width) {
+                if bit_width > integer_type.get_width() {
                     panic!("Bit-width too large for integer type!");
                 }
                 bit_width
@@ -167,7 +124,7 @@ pub fn no_discrimination_bits(args: TokenStream, input: TokenStream) -> TokenStr
     };
 
     for (i, v) in data.variants.iter().enumerate() {
-        if v.ident.to_string() == "Default" {
+        if v.ident.to_string() == "_Default" {
             if i != data.variants.len() - 1 {
                 panic!("Default condition present but not at end of list!");
             }
@@ -185,7 +142,7 @@ pub fn no_discrimination_bits(args: TokenStream, input: TokenStream) -> TokenStr
                 }
                 default_discriminant += 1;
             }
-            variants.push(("Default".to_owned(), default_discriminant));
+            variants.push(("_Default".to_owned(), default_discriminant));
             discriminants.push(default_discriminant);
             has_default = true;
         } else {
@@ -268,7 +225,7 @@ pub fn no_discrimination_bits(args: TokenStream, input: TokenStream) -> TokenStr
         let variant_name = format_ident!("{}", variant_name);
         to_int_matches.extend(quote! { #name::#variant_name => #discriminant as #itype, });
 
-        if variant_name == "Default" {
+        if variant_name == "_Default" {
             from_int_matches.extend(quote! { _ => #name::#variant_name, });
         } else {
             match integer_type {
@@ -303,7 +260,7 @@ pub fn no_discrimination_bits(args: TokenStream, input: TokenStream) -> TokenStr
         }
     };
     // Do not include _ case if the integer is completely covered
-    let from_int_match = if integer_type.width_match(bit_width) {
+    let from_int_match = if bit_width == integer_type.get_width() {
         quote! {
             match masked_value {
                 #from_int_matches

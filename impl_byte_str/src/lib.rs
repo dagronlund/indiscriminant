@@ -23,16 +23,18 @@ pub fn no_discrimination_byte_str(args: TokenStream, input: TokenStream) -> Toke
     };
 
     for (i, v) in data.variants.iter().enumerate() {
-        if i == data.variants.len() - 1 && v.ident.to_string() != "Default" {
-            panic!("Default condition not at end of list!");
-        }
-
-        if v.ident.to_string() == "Default" {
+        if v.ident.to_string() == "_Default" {
+            if i != data.variants.len() - 1 {
+                panic!("Default condition found, but not at end of list!");
+            }
             match &v.discriminant {
                 None => {}
                 _ => panic!("Default value has discriminant!"),
             }
         } else {
+            if i == data.variants.len() - 1 {
+                panic!("End of list found before default condition!");
+            }
             let (discriminant, span) = match &v.discriminant {
                 Some((_, expr)) => {
                     let discriminant = match expr {
@@ -73,7 +75,7 @@ pub fn no_discrimination_byte_str(args: TokenStream, input: TokenStream) -> Toke
         let variant_name = format_ident!("{}", variant_name);
         variants_quote.extend(quote! { #variant_name, });
     }
-    variants_quote.extend(quote! { Default, });
+    variants_quote.extend(quote! { _Default, });
 
     match input.vis {
         Visibility::Public(_) => result.extend(quote! {
@@ -105,17 +107,16 @@ pub fn no_discrimination_byte_str(args: TokenStream, input: TokenStream) -> Toke
         from_byte_str_matches.extend(quote! { #discriminant => #name::#variant_name, });
     }
 
-    let default_variant = format_ident!("{}", "Default");
     let to_byte_str_match = quote! {
         match self {
             #to_byte_str_matches
-            #name::#default_variant => b"",
+            #name::_Default => b"",
         }
     };
     let from_byte_str_match = quote! {
         match value {
             #from_byte_str_matches
-            _ => #name::#default_variant,
+            _ => #name::_Default,
         }
     };
 
