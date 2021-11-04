@@ -26,7 +26,7 @@ Even for u8 enums, covering all 256 possibilities is untenable.
 To fix this you can apply the no_discrimination attribute to enums:
 
 ```rust
-#[no_discrimination(u8, 1)]
+#[no_discrimination_bits(u8, 1)]
 enum MyDiscriminantEnum {
     A = 0,
     B = 1
@@ -40,7 +40,7 @@ You can also specify if an integer is supposed to be zero'd except for the enum
 fields when converting it to the enum:
 
 ```rust
-#[no_discrimination_safe(u8, 1)]
+#[no_discrimination_bits(u8, 1)]
 enum MyDiscriminantEnum {
     A = 0,
     B = 1
@@ -51,7 +51,7 @@ You do not have to specify every possible value for the enum you are specifying,
 but if not you need to add an un-valued field named Default
 
 ```rust
-#[no_discrimination_safe(u8, 2)]
+#[no_discrimination_bits(u8, 2)]
 enum MyDiscriminantEnum {
     A = 0,
     B = 1,

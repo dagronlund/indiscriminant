@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2018"
 
 [dependencies]
-no_discrimination_impl_byte_str = { path = "impl_byte_str" }
-no_discrimination_impl_str = { path = "impl_str" }
-no_discrimination_impl_bits = { path = "impl_bits" }
+no_discrimination_impl_byte_str = { path = "impl_byte_str", version = "0.1.0" }
+no_discrimination_impl_str = { path = "impl_str", version = "0.1.0" }
+no_discrimination_impl_bits = { path = "impl_bits", version = "0.1.0" }
