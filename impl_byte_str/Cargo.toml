@@ -1,5 +1,5 @@
 [package]
-name = "no_discrimination_impl"
+name = "no_discrimination_impl_byte_str"
 version = "0.1.0"
 edition = "2018"
 
