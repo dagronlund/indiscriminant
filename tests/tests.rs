@@ -2,16 +2,16 @@ use no_discrimination::*;
 
 #[test]
 fn test_bits() {
-    #[no_discrimination_bits(u8, 8)]
+    #[no_discrimination_bits_default(u8, 8)]
     pub enum TestEnum {
         A = 0,
         B = 1,
         C = 2,
         D = 3,
-        _Default,
+        Default,
     }
 
-    #[no_discrimination_bits(u8, 2)]
+    #[no_discrimination_bits_default(u8, 2)]
     pub enum TestEnumFull {
         A = 0,
         B = 1,
@@ -19,7 +19,7 @@ fn test_bits() {
         D = 3,
     }
 
-    #[no_discrimination_bits(u16, 8)]
+    #[no_discrimination_bits_default(u16, 8)]
     #[derive(PartialEq)]
     pub enum TestEnum16 {
         A = 0,
@@ -27,16 +27,16 @@ fn test_bits() {
         C = 2,
         D = 3,
         E = 4,
-        _Default,
+        Default,
     }
 
     assert!(TestEnum16::from_int(0) == TestEnum16::A);
     assert!(TestEnum16::from_int(4) == TestEnum16::E);
-    assert!(TestEnum16::from_int(5) == TestEnum16::_Default);
-    assert!(TestEnum16::from_int(255) == TestEnum16::_Default);
-    assert!(TestEnum16::_Default.to_int() == 5);
+    assert!(TestEnum16::from_int(5) == TestEnum16::Default);
+    assert!(TestEnum16::from_int(255) == TestEnum16::Default);
+    assert!(TestEnum16::Default.to_int() == 5);
 
-    #[no_discrimination_bits(u8, 8)]
+    #[no_discrimination_bits_default(u8, 8)]
     #[derive(PartialEq)]
     enum FullEnum {
         B0 = 0,
@@ -295,37 +295,54 @@ fn test_bits() {
         B253 = 253,
         // B254 = 254,
         B255 = 255,
-        _Default,
+        Default,
     }
 
     assert!(FullEnum::B0.to_int() == 0);
     assert!(FullEnum::B253.to_int() == 253);
-    assert!(FullEnum::_Default.to_int() == 254);
+    assert!(FullEnum::Default.to_int() == 254);
     assert!(FullEnum::B255.to_int() == 255);
 
     assert!(FullEnum::from_int(0) == FullEnum::B0);
     assert!(FullEnum::from_int(253) == FullEnum::B253);
-    assert!(FullEnum::from_int(254) == FullEnum::_Default);
+    assert!(FullEnum::from_int(254) == FullEnum::Default);
     assert!(FullEnum::from_int(255) == FullEnum::B255);
 
-    #[no_discrimination_bits(u8, 2)]
+    #[no_discrimination_bits_default(u8, 2)]
     #[derive(PartialEq)]
     pub enum TestEnumMixed {
         A = 0,
         B = 1,
         D = 3,
-        _Default,
+        Default,
     }
 
     assert!(TestEnumMixed::A.to_int() == 0);
     assert!(TestEnumMixed::B.to_int() == 1);
-    assert!(TestEnumMixed::_Default.to_int() == 2);
+    assert!(TestEnumMixed::Default.to_int() == 2);
     assert!(TestEnumMixed::D.to_int() == 3);
 
     assert!(TestEnumMixed::from_int(0) == TestEnumMixed::A);
     assert!(TestEnumMixed::from_int(1) == TestEnumMixed::B);
-    assert!(TestEnumMixed::from_int(2) == TestEnumMixed::_Default);
+    assert!(TestEnumMixed::from_int(2) == TestEnumMixed::Default);
     assert!(TestEnumMixed::from_int(3) == TestEnumMixed::D);
+
+    #[no_discrimination_bits(u8, 2)]
+    #[derive(PartialEq)]
+    pub enum TestEnumOption {
+        A = 0,
+        B = 1,
+        D = 3,
+    }
+
+    assert!(TestEnumOption::A.to_int() == 0);
+    assert!(TestEnumOption::B.to_int() == 1);
+    assert!(TestEnumOption::D.to_int() == 3);
+
+    assert!(TestEnumOption::from_int(0) == Some(TestEnumOption::A));
+    assert!(TestEnumOption::from_int(1) == Some(TestEnumOption::B));
+    assert!(TestEnumOption::from_int(2) == None);
+    assert!(TestEnumOption::from_int(3) == Some(TestEnumOption::D));
 }
 
 #[test]
