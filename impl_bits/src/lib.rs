@@ -13,7 +13,6 @@ enum IntegerType {
     U32 = "u32",
     U64 = "u64",
     U128 = "u128",
-    _Default,
 }
 
 impl IntegerType {
@@ -24,7 +23,6 @@ impl IntegerType {
             IntegerType::U32 => 32,
             IntegerType::U64 => 64,
             IntegerType::U128 => 128,
-            _ => 0,
         }
     }
 
@@ -35,7 +33,6 @@ impl IntegerType {
             IntegerType::U32 => value < (1 << 32),
             IntegerType::U64 => true,
             IntegerType::U128 => true,
-            _ => false,
         }
     }
 
@@ -72,8 +69,8 @@ pub fn no_discrimination_bits(args: TokenStream, input: TokenStream) -> TokenStr
 
     let integer_type = if let Some(arg) = iter.next() {
         match IntegerType::from_str(&arg.to_string()) {
-            IntegerType::_Default => panic!("Invalid integer type argument!"),
-            integer_type => integer_type,
+            Some(integer_type) => integer_type,
+            None => panic!("Invalid integer type argument!"),
         }
     } else {
         panic!("Expected two macro arguments, found none!");
@@ -183,7 +180,6 @@ pub fn no_discrimination_bits(args: TokenStream, input: TokenStream) -> TokenStr
         panic!("Enum is empty of any variants!");
     }
 
-    let mut result = quote!();
     let name = format_ident!("{}", input.ident.to_string());
     let itype = format_ident!("{}", integer_type.to_str());
 
@@ -193,127 +189,81 @@ pub fn no_discrimination_bits(args: TokenStream, input: TokenStream) -> TokenStr
         variants_quote.extend(quote! { #variant_name = #discriminant as #itype, });
     }
 
-    result.extend(quote! { #[repr(#itype)] });
-    for attr in input.attrs {
-        result.extend(quote! { #attr });
-    }
-
-    match input.vis {
-        Visibility::Public(_) => result.extend(quote! {
-            pub enum #name {
-                #variants_quote
-            }
-        }),
-        Visibility::Crate(_) => result.extend(quote! {
-            pub(crate) enum #name {
-                #variants_quote
-            }
-        }),
-        _ => result.extend(quote! {
-            enum #name {
-                #variants_quote
-            }
-        }),
-    }
-
     // Implement functions to convert generated enum to/from integers
 
-    let mut to_int_matches = quote!();
-    let mut from_int_matches = quote!();
+    let mut to_matches = quote!();
+    let mut from_matches = quote!();
 
     for (variant_name, discriminant) in &variants {
         let variant_name = format_ident!("{}", variant_name);
-        to_int_matches.extend(quote! { #name::#variant_name => #discriminant as #itype, });
+        to_matches.extend(quote! { #name::#variant_name => #discriminant as #itype, });
 
         if variant_name == "_Default" {
-            from_int_matches.extend(quote! { _ => #name::#variant_name, });
+            from_matches.extend(quote! { _ => #name::#variant_name, });
         } else {
             match integer_type {
                 IntegerType::U8 => {
                     let discriminant = *discriminant as u8;
-                    from_int_matches.extend(quote! { #discriminant => #name::#variant_name, });
+                    from_matches.extend(quote! { #discriminant => #name::#variant_name, });
                 }
                 IntegerType::U16 => {
                     let discriminant = *discriminant as u16;
-                    from_int_matches.extend(quote! { #discriminant => #name::#variant_name, });
+                    from_matches.extend(quote! { #discriminant => #name::#variant_name, });
                 }
                 IntegerType::U32 => {
                     let discriminant = *discriminant as u32;
-                    from_int_matches.extend(quote! { #discriminant => #name::#variant_name, });
+                    from_matches.extend(quote! { #discriminant => #name::#variant_name, });
                 }
                 IntegerType::U64 => {
                     let discriminant = *discriminant as u64;
-                    from_int_matches.extend(quote! { #discriminant => #name::#variant_name, });
+                    from_matches.extend(quote! { #discriminant => #name::#variant_name, });
                 }
                 IntegerType::U128 => {
                     let discriminant = *discriminant as u128;
-                    from_int_matches.extend(quote! { #discriminant => #name::#variant_name, });
+                    from_matches.extend(quote! { #discriminant => #name::#variant_name, });
                 }
-                _ => {}
             }
         }
     }
 
-    let to_int_match = quote! {
-        match self {
-            #to_int_matches
-        }
-    };
     // Do not include _ case if the integer is completely covered
-    let from_int_match = if bit_width == integer_type.get_width() {
-        quote! {
-            match masked_value {
-                #from_int_matches
-            }
-        }
+    let from_match_default = if bit_width == integer_type.get_width() || has_default {
+        quote! {}
     } else {
-        if has_default {
-            quote! {
-                match masked_value {
-                    #from_int_matches
-                }
-            }
-        } else {
-            // We need to pick something to appease the compiler but this will never be used
-            let default_variant = format_ident!("{}", variants.iter().next().unwrap().0);
-            quote! {
-                match masked_value {
-                    #from_int_matches
-                    _ => #name::#default_variant,
-                }
-            }
-        }
+        // We need to pick something to appease the compiler but this will never be used
+        let default_variant = format_ident!("{}", variants.iter().next().unwrap().0);
+        quote! { _ => #name::#default_variant, }
     };
 
+    // Figure out visibility
+    let vis = match input.vis {
+        Visibility::Public(_) => quote! { pub },
+        Visibility::Crate(_) => quote! { pub(crate) },
+        _ => quote! {},
+    };
+
+    // Construct resulting struct and impl functions, can debug with `result.to_string()`
     let bit_mask: usize = (1 << bit_width) - 1;
-
-    match input.vis {
-        Visibility::Public(_) => {
-            result.extend(quote! {
-                impl #name {
-                    pub fn to_int(&self) -> #itype { #to_int_match }
-                    pub fn from_int(value: #itype) -> Self { let masked_value = #bit_mask as #itype & value; #from_int_match }
-                }
-            });
+    let attrs = input.attrs.iter().map(|attr| quote! { #attr });
+    proc_macro::TokenStream::from(quote! {
+        #(#attrs)*
+        #[repr(#itype)]
+        #vis enum #name {
+            #variants_quote
         }
-        Visibility::Crate(_) => {
-            result.extend(quote! {
-                impl #name {
-                    pub(crate) fn to_int(&self) -> #itype { #to_int_match }
-                    pub(crate) fn from_int(value: #itype) -> Self { let masked_value = #bit_mask as #itype & value; #from_int_match }
+        impl #name {
+            #vis fn to_int(&self) -> #itype {
+                match self {
+                    #to_matches
                 }
-            });
-        }
-        _ => {
-            result.extend(quote! {
-                impl #name {
-                    fn to_int(&self) -> #itype { #to_int_match }
-                    fn from_int(value: #itype) -> Self { let masked_value = #bit_mask as #itype & value; #from_int_match }
+            }
+            #vis fn from_int(value: #itype) -> Self {
+                let masked_value = #bit_mask as #itype & value;
+                match masked_value {
+                    #from_matches
+                    #from_match_default
                 }
-            });
+            }
         }
-    }
-
-    // Can debug with `result.to_string()`
-    proc_macro::TokenStream::from(result)
+    })
 }

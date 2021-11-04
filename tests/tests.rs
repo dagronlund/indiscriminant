@@ -330,40 +330,74 @@ fn test_bits() {
 
 #[test]
 fn test_byte_str() {
-    #[no_discrimination_byte_str()]
+    #[no_discrimination_byte_str_default()]
     #[derive(PartialEq)]
-    pub enum TestEnumAB {
+    pub enum TestEnumDefault {
         A = b"A",
         B = b"B",
-        _Default,
+        Default,
     }
 
-    assert!(TestEnumAB::A.to_byte_str() == b"A");
-    assert!(TestEnumAB::B.to_byte_str() == b"B");
-    assert!(TestEnumAB::_Default.to_byte_str() == b"");
+    assert!(TestEnumDefault::A.to_byte_str() == b"A");
+    assert!(TestEnumDefault::B.to_byte_str() == b"B");
+    assert!(TestEnumDefault::Default.to_byte_str() == b"");
 
-    assert!(TestEnumAB::from_byte_str(b"A") == TestEnumAB::A);
-    assert!(TestEnumAB::from_byte_str(b"B") == TestEnumAB::B);
-    assert!(TestEnumAB::from_byte_str(b"") == TestEnumAB::_Default);
-    assert!(TestEnumAB::from_byte_str(b"ASDF") == TestEnumAB::_Default);
+    assert!(TestEnumDefault::from_byte_str(b"A") == TestEnumDefault::A);
+    assert!(TestEnumDefault::from_byte_str(b"B") == TestEnumDefault::B);
+    assert!(TestEnumDefault::from_byte_str(b"") == TestEnumDefault::Default);
+    assert!(TestEnumDefault::from_byte_str(b"ASDF") == TestEnumDefault::Default);
+
+    #[no_discrimination_byte_str()]
+    #[derive(PartialEq)]
+    pub enum TestEnum {
+        A = b"A",
+        B = b"B",
+        C = b"",
+    }
+
+    assert!(TestEnum::A.to_byte_str() == b"A");
+    assert!(TestEnum::B.to_byte_str() == b"B");
+    assert!(TestEnum::C.to_byte_str() == b"");
+
+    assert!(TestEnum::from_byte_str(b"A") == Some(TestEnum::A));
+    assert!(TestEnum::from_byte_str(b"B") == Some(TestEnum::B));
+    assert!(TestEnum::from_byte_str(b"") == Some(TestEnum::C));
+    assert!(TestEnum::from_byte_str(b"ASDF") == None);
 }
 
 #[test]
 fn test_str() {
-    #[no_discrimination_str()]
+    #[no_discrimination_str_default()]
     #[derive(PartialEq)]
-    pub enum TestEnumAB {
+    pub enum TestEnumDefault {
         A = "A",
         B = "B",
-        _Default,
+        Default,
     }
 
-    assert!(TestEnumAB::A.to_str() == "A");
-    assert!(TestEnumAB::B.to_str() == "B");
-    assert!(TestEnumAB::_Default.to_str() == "");
+    assert!(TestEnumDefault::A.to_str() == "A");
+    assert!(TestEnumDefault::B.to_str() == "B");
+    assert!(TestEnumDefault::Default.to_str() == "");
 
-    assert!(TestEnumAB::from_str("A") == TestEnumAB::A);
-    assert!(TestEnumAB::from_str("B") == TestEnumAB::B);
-    assert!(TestEnumAB::from_str("") == TestEnumAB::_Default);
-    assert!(TestEnumAB::from_str("ASDF") == TestEnumAB::_Default);
+    assert!(TestEnumDefault::from_str("A") == TestEnumDefault::A);
+    assert!(TestEnumDefault::from_str("B") == TestEnumDefault::B);
+    assert!(TestEnumDefault::from_str("") == TestEnumDefault::Default);
+    assert!(TestEnumDefault::from_str("ASDF") == TestEnumDefault::Default);
+
+    #[no_discrimination_str()]
+    #[derive(PartialEq)]
+    pub enum TestEnum {
+        A = "A",
+        B = "B",
+        C = "",
+    }
+
+    assert!(TestEnum::A.to_str() == "A");
+    assert!(TestEnum::B.to_str() == "B");
+    assert!(TestEnum::C.to_str() == "");
+
+    assert!(TestEnum::from_str("A") == Some(TestEnum::A));
+    assert!(TestEnum::from_str("B") == Some(TestEnum::B));
+    assert!(TestEnum::from_str("") == Some(TestEnum::C));
+    assert!(TestEnum::from_str("ASDF") == None);
 }
