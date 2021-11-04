@@ -1,7 +1,6 @@
-# bitsmart_enum
+# no_discrimination
 
-Normal rust enums can be created with specified with custom discriminants like
-such:
+Normal rust enums can be created with specified with custom discriminants:
 
 ```rust
 enum MyEnum {
@@ -24,11 +23,11 @@ However conversion between integers and the enum can be clunky and could
 potentially result in an error if the enum cases are not completely covered.
 Even for u8 enums, covering all 256 possibilities is untenable.
 
-To fix this you can apply the bitsmart_enum attribute to enums:
+To fix this you can apply the no_discrimination attribute to enums:
 
 ```rust
-#[bitsmart_enum(u8, 1)]
-enum MyBitsmartEnum {
+#[no_discrimination(u8, 1)]
+enum MyDiscriminantEnum {
     A = 0,
     B = 1
 }
@@ -41,8 +40,8 @@ You can also specify if an integer is supposed to be zero'd except for the enum
 fields when converting it to the enum:
 
 ```rust
-#[bitsmart_enum_safe(u8, 1)]
-enum MyBitsmartEnum {
+#[no_discrimination_safe(u8, 1)]
+enum MyDiscriminantEnum {
     A = 0,
     B = 1
 }
@@ -52,8 +51,8 @@ You do not have to specify every possible value for the enum you are specifying,
 but if not you need to add an un-valued field named Default
 
 ```rust
-#[bitsmart_enum_safe(u8, 2)]
-enum MyBitsmartEnum {
+#[no_discrimination_safe(u8, 2)]
+enum MyDiscriminantEnum {
     A = 0,
     B = 1,
     Default
@@ -61,12 +60,12 @@ enum MyBitsmartEnum {
 ```
 
 The default variant must be last if it is going to exist at all. The
-bitsmart_enum attribute also provides two functions for each enum it is applied
+no_discrimination attribute also provides two functions for each enum it is applied
 to
 
 ```rust
-let a: u8 = MyBitsmartEnum::A.to_int();
-let b: MyBitsmartEnum = MyBitsmartEnum::from_int(a);
+let a: u8 = MyDiscriminantEnum::A.to_int();
+let b: MyDiscriminantEnum = MyDiscriminantEnum::from_int(a);
 ```
 
 The functions are guaranteed to succeed, hence the requirements on Default

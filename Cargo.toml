@@ -1,7 +1,7 @@
 [package]
-name = "bitsmart_enum"
+name = "no_discrimination"
 version = "0.1.0"
 edition = "2018"
 
 [dependencies]
-bitsmart_enum_impl = { path = "impl" }
+no_discrimination_impl = { path = "impl" }

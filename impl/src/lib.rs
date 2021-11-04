@@ -100,7 +100,7 @@ impl IntegerType {
     }
 }
 
-fn bitsmart_enum_impl(args: TokenStream, input: TokenStream) -> TokenStream {
+fn no_discrimination_impl(args: TokenStream, input: TokenStream) -> TokenStream {
     // Parse argument list into integer type and bit-width
     let mut i = 0;
     let mut bit_width = 0;
@@ -317,11 +317,11 @@ fn bitsmart_enum_impl(args: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_attribute]
-pub fn bitsmart_enum(args: TokenStream, input: TokenStream) -> TokenStream {
-    bitsmart_enum_impl(args, input)
+pub fn no_discrimination(args: TokenStream, input: TokenStream) -> TokenStream {
+    no_discrimination_impl(args, input)
 }
 
 // #[proc_macro_attribute]
-// pub fn bitsmart_enum_safe(args: TokenStream, input: TokenStream) -> TokenStream {
-//     bitsmart_enum_impl(args, input, true)
+// pub fn no_discrimination_safe(args: TokenStream, input: TokenStream) -> TokenStream {
+//     no_discrimination_impl(args, input, true)
 // }
