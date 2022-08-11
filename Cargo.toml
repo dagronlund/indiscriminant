@@ -1,9 +1,9 @@
 [package]
-name = "no_discrimination"
+name = "indiscriminant"
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
 
 [dependencies]
-no_discrimination_impl_byte_str = { path = "impl_byte_str", version = "0.1.0" }
-no_discrimination_impl_str = { path = "impl_str", version = "0.1.0" }
-no_discrimination_impl_bits = { path = "impl_bits", version = "0.1.0" }
+indiscriminant_impl_byte_str = { path = "impl_byte_str", version = "0.1.0" }
+indiscriminant_impl_str = { path = "impl_str", version = "0.1.0" }
+indiscriminant_impl_bits = { path = "impl_bits", version = "0.1.0" }

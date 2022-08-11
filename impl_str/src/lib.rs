@@ -15,7 +15,7 @@ fn get_vis(vis: &Visibility) -> QuoteResult {
 }
 
 #[proc_macro_attribute]
-pub fn no_discrimination_str_default(args: TokenStream, input: TokenStream) -> TokenStream {
+pub fn indiscriminant_str_default(args: TokenStream, input: TokenStream) -> TokenStream {
     // Parse argument list into integer type and bit-width
     let mut iter = args.into_iter();
 
@@ -118,7 +118,7 @@ pub fn no_discrimination_str_default(args: TokenStream, input: TokenStream) -> T
 }
 
 #[proc_macro_attribute]
-pub fn no_discrimination_str(args: TokenStream, input: TokenStream) -> TokenStream {
+pub fn indiscriminant_str(args: TokenStream, input: TokenStream) -> TokenStream {
     // Parse argument list into integer type and bit-width
     let mut iter = args.into_iter();
 

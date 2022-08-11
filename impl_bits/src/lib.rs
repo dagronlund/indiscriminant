@@ -3,7 +3,7 @@ use quote::*;
 
 use syn::{parse_macro_input, Data, DeriveInput, Expr, Lit, Visibility};
 
-use no_discrimination_impl_str::*;
+use indiscriminant_impl_str::*;
 
 type QuoteResult = quote::__private::TokenStream;
 
@@ -15,7 +15,7 @@ fn get_vis(vis: &Visibility) -> QuoteResult {
     }
 }
 
-#[no_discrimination_str()]
+#[indiscriminant_str()]
 #[derive(PartialEq)]
 enum IntegerType {
     U8 = "u8",
@@ -146,7 +146,7 @@ fn parse_args(args: TokenStream) -> (IntegerType, u8) {
 }
 
 #[proc_macro_attribute]
-pub fn no_discrimination_bits_default(args: TokenStream, input: TokenStream) -> TokenStream {
+pub fn indiscriminant_bits_default(args: TokenStream, input: TokenStream) -> TokenStream {
     // Parse argument list into integer type and bit-width
     let (integer_type, bit_width) = parse_args(args);
 
@@ -271,7 +271,7 @@ pub fn no_discrimination_bits_default(args: TokenStream, input: TokenStream) -> 
 }
 
 #[proc_macro_attribute]
-pub fn no_discrimination_bits(args: TokenStream, input: TokenStream) -> TokenStream {
+pub fn indiscriminant_bits(args: TokenStream, input: TokenStream) -> TokenStream {
     // Parse argument list into integer type and bit-width
     let (integer_type, bit_width) = parse_args(args);
 

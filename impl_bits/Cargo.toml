@@ -1,7 +1,7 @@
 [package]
-name = "no_discrimination_impl_bits"
+name = "indiscriminant_impl_bits"
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
 
 [lib]
 proc-macro = true
@@ -9,4 +9,4 @@ proc-macro = true
 [dependencies]
 syn = "1.0.76"
 quote = "1.0.9"
-no_discrimination_impl_str = { path = "../impl_str", version = "0.1.0" }
+indiscriminant_impl_str = { path = "../impl_str", version = "0.1.0" }
