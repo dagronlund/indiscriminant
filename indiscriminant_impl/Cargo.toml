@@ -1,5 +1,5 @@
 [package]
-name = "indiscriminant_impl_str"
+name = "indiscriminant_impl"
 description = "A proc-macro for mapping between values and enum discriminants"
 repository = "https://github.com/dagronlund/indiscriminant"
 license = "MIT"
@@ -10,5 +10,7 @@ edition = "2021"
 proc-macro = true
 
 [dependencies]
+proc-macro2 = "1.0.43"
 syn = "1.0.76"
 quote = "1.0.9"
+indiscriminant_lib = "0.1.0"

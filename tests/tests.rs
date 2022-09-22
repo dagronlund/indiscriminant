@@ -2,16 +2,25 @@ use indiscriminant::*;
 
 #[test]
 fn test_bits() {
-    #[indiscriminant_bits_default(u8, 8)]
+    #[indiscriminant_bits(u8, 8, Default)]
     pub enum TestEnum {
         A = 0,
         B = 1,
         C = 2,
         D = 3,
-        Default,
     }
 
-    #[indiscriminant_bits_default(u8, 2)]
+    #[indiscriminant_bits(u8, Default = 8)]
+    pub enum TestEnumAuto {
+        A = 0,
+        B = 1,
+        C = 2,
+        D = 3,
+    }
+
+    assert!(TestEnumAuto::Default.to_int() == 8);
+
+    #[indiscriminant_bits(u8, 2)]
     pub enum TestEnumFull {
         A = 0,
         B = 1,
@@ -19,7 +28,7 @@ fn test_bits() {
         D = 3,
     }
 
-    #[indiscriminant_bits_default(u16, 8)]
+    #[indiscriminant_bits(u16, 8, Default)]
     #[derive(PartialEq)]
     pub enum TestEnum16 {
         A = 0,
@@ -27,7 +36,6 @@ fn test_bits() {
         C = 2,
         D = 3,
         E = 4,
-        Default,
     }
 
     assert!(TestEnum16::from_int(0) == TestEnum16::A);
@@ -36,7 +44,7 @@ fn test_bits() {
     assert!(TestEnum16::from_int(255) == TestEnum16::Default);
     assert!(TestEnum16::Default.to_int() == 5);
 
-    #[indiscriminant_bits_default(u8, 8)]
+    #[indiscriminant_bits(u8, 8, Default)]
     #[derive(PartialEq)]
     enum FullEnum {
         B0 = 0,
@@ -295,7 +303,6 @@ fn test_bits() {
         B253 = 253,
         // B254 = 254,
         B255 = 255,
-        Default,
     }
 
     assert!(FullEnum::B0.to_int() == 0);
@@ -308,13 +315,12 @@ fn test_bits() {
     assert!(FullEnum::from_int(254) == FullEnum::Default);
     assert!(FullEnum::from_int(255) == FullEnum::B255);
 
-    #[indiscriminant_bits_default(u8, 2)]
+    #[indiscriminant_bits(u8, 2, Default)]
     #[derive(PartialEq)]
     pub enum TestEnumMixed {
         A = 0,
         B = 1,
         D = 3,
-        Default,
     }
 
     assert!(TestEnumMixed::A.to_int() == 0);
@@ -347,12 +353,11 @@ fn test_bits() {
 
 #[test]
 fn test_byte_str() {
-    #[indiscriminant_byte_str_default()]
+    #[indiscriminant_byte_str(Default = b"")]
     #[derive(PartialEq)]
     pub enum TestEnumDefault {
         A = b"A",
         B = b"B",
-        Default,
     }
 
     assert!(TestEnumDefault::A.to_byte_str() == b"A");
@@ -384,12 +389,11 @@ fn test_byte_str() {
 
 #[test]
 fn test_str() {
-    #[indiscriminant_str_default()]
+    #[indiscriminant_str(Default = "")]
     #[derive(PartialEq)]
     pub enum TestEnumDefault {
         A = "A",
         B = "B",
-        Default,
     }
 
     assert!(TestEnumDefault::A.to_str() == "A");
@@ -400,6 +404,15 @@ fn test_str() {
     assert!(TestEnumDefault::from_str("B") == TestEnumDefault::B);
     assert!(TestEnumDefault::from_str("") == TestEnumDefault::Default);
     assert!(TestEnumDefault::from_str("ASDF") == TestEnumDefault::Default);
+
+    #[indiscriminant_str(Default = "Test")]
+    #[derive(PartialEq)]
+    pub enum TestEnumDefaultOther {
+        A = "A",
+        B = "B",
+    }
+
+    assert!(TestEnumDefaultOther::Default.to_str() == "Test");
 
     #[indiscriminant_str()]
     #[derive(PartialEq)]
@@ -417,4 +430,28 @@ fn test_str() {
     assert!(TestEnum::from_str("B") == Some(TestEnum::B));
     assert!(TestEnum::from_str("") == Some(TestEnum::C));
     assert!(TestEnum::from_str("ASDF") == None);
+}
+
+#[test]
+fn test_all() {
+    #[indiscriminant(Default = "")]
+    #[derive(PartialEq)]
+    pub enum TestEnumStr {
+        A = "A",
+        B = "B",
+    }
+
+    #[indiscriminant(Default = b"")]
+    #[derive(PartialEq)]
+    pub enum TestEnumByteStr {
+        A = b"A",
+        B = b"B",
+    }
+
+    #[indiscriminant(u8, Default = 2)]
+    #[derive(PartialEq)]
+    pub enum TestEnumBits {
+        A = 0,
+        B = 1,
+    }
 }

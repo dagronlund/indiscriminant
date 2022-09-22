@@ -3,10 +3,8 @@ name = "indiscriminant"
 description = "A proc-macro for mapping between values and enum discriminants"
 repository = "https://github.com/dagronlund/indiscriminant"
 license = "MIT"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 [dependencies]
-indiscriminant_impl_byte_str = "0.1.0"
-indiscriminant_impl_str = "0.1.0"
-indiscriminant_impl_bits = "0.1.0"
+indiscriminant_impl = "0.1.0"
